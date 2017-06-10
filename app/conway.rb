@@ -1,3 +1,13 @@
+# 这里 require 的内容, 是 Opal 自己的 LOAD_PATH 之下可以查找到的 Ruby 库.
+# 这些库将来会被编译成 js.
+
+require 'opal'
+require 'opal-jquery'
+require 'ostruct'
+
+class Coordinates < OpenStruct
+end
+
 class Grid
   attr_reader :height, :width, :canvas, :context, :max_x, :max_y
 
