@@ -5,6 +5,6 @@ require 'opal'
 desc 'Build our app to conway.js'
 task :build do
   Opal.append_path 'app'
-  File.unlink('app/conway.js')
+  File.unlink('app/conway.js') if File.exist? 'app/conway.js'
   File.binwrite 'app/conway.js', Opal::Builder.build('conway').to_s
 end
