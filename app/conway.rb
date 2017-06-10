@@ -101,4 +101,4 @@ end
 
 grid = Grid.new
 grid.draw_canvas
-# grid.add_mouse_event_listener
+grid.add_mouse_event_listener
