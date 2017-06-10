@@ -1,6 +1,3 @@
-require 'opal'
-require 'opal-jquery'
-
 class Grid
   attr_reader :height, :width, :canvas, :context, :max_x, :max_y
 
