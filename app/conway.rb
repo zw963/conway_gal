@@ -48,7 +48,57 @@ class Grid
   def canvas_id
     'conwayCanvas'
   end
+
+  def fill_cell(x, y)
+    x *= CELL_WIDTH;
+    y *= CELL_HEIGHT;
+    `#{context}.fillStyle = "#000"`
+    `#{context}.fillRect(#{x.floor+1}, #{y.floor+1}, #{CELL_WIDTH-1}, #{CELL_HEIGHT-1})`
+  end
+
+  def unfill_cell(x, y)
+    x *= CELL_WIDTH;
+    y *= CELL_HEIGHT;
+    `#{context}.clearRect(#{x.floor+1}, #{y.floor+1}, #{CELL_WIDTH-1}, #{CELL_HEIGHT-1})`
+  end
+
+  def get_cursor_position(event)
+    # 这里的 if/else 是为了兼容不同浏览器设置.
+    if (event.page_x && event.page_y)
+      x = event.page_x;
+      y = event.page_y;
+    else
+      doc = Opal.Document[0]
+      x = event[:clientX] + doc.scrollLeft +
+        doc.documentElement.scrollLeft;
+      y = event[:clientY] + doc.body.scrollTop +
+        doc.documentElement.scrollTop;
+    end
+
+    x -= `#{canvas}.offsetLeft`
+    y -= `#{canvas}.offsetTop`
+
+    x = (x / CELL_WIDTH).floor
+    y = (y / CELL_HEIGHT).floor
+
+    Coordinates.new(x: x, y: y)
+  end
+
+  def add_mouse_event_listener
+    Element.find("##{canvas_id}").on :click do |event|
+      coords = get_cursor_position(event)
+      x, y   = coords.x, coords.y
+      fill_cell(x, y)
+    end
+
+    Element.find("##{canvas_id}").on :dblclick do |event|
+      coords = get_cursor_position(event)
+      x, y   = coords.x, coords.y
+      unfill_cell(x, y)
+    end
+  end
 end
 
 grid = Grid.new
 grid.draw_canvas
+# grid.add_mouse_event_listener
