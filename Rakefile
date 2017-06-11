@@ -5,6 +5,6 @@ require 'opal'
 desc 'Build our app to js'
 task :build do
   Opal.append_path 'app'
-  File.unlink('app/grid.js') if File.exist? 'app/grid.js'
-  File.binwrite 'app/grid.js', Opal::Builder.build('grid').to_s
+  File.unlink('app/conway.js') if File.exist? 'app/conway.js'
+  File.binwrite 'app/conway.js', Opal::Builder.build('conway').to_s
 end

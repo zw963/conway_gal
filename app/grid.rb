@@ -1,8 +1,6 @@
 # 这里 require 的内容, 是 Opal 自己的 LOAD_PATH 之下可以查找到的 Ruby 库.
 # 这些库将来会被编译成 js.
 
-require 'opal'
-require 'opal-jquery'
 require 'ostruct'
 
 class Coordinates < OpenStruct
@@ -10,6 +8,7 @@ end
 
 class Grid
   attr_reader :height, :width, :canvas, :context, :max_x, :max_y
+  attr_accessor :state
 
   CELL_HEIGHT = 15
   CELL_WIDTH  = 15
@@ -21,6 +20,29 @@ class Grid
     @context = `#{canvas}.getContext('2d')` # 每一个 canvas 有一个 context, 我们只能在 context 之上画图.
     @max_x   = (height / CELL_HEIGHT).floor # 决定网格的大小, CELL_HIGHT 数值代表像素的宽度.
     @max_y   = (width / CELL_WIDTH).floor
+    @seed    = []
+    @state   = blank_state
+    draw_canvas
+    add_mouse_event_listener
+    add_enter_event_listener
+    add_demo_event_listener
+  end
+
+  def blank_state
+    h = Hash.new
+    (0..max_x).each do |x|
+      (0..max_y).each do |y|
+        h[[x,y]] = 0
+      end
+    end
+    h
+  end
+
+  def redraw_canvas
+    draw_canvas
+    state.each do |cell, liveness|
+      fill_cell(cell[0], cell[1]) if liveness == 1
+    end
   end
 
   def draw_canvas
@@ -88,17 +110,56 @@ class Grid
     Element.find("##{canvas_id}").on :click do |event|
       coords = get_cursor_position(event)
       x, y   = coords.x, coords.y
-      fill_cell(x, y)
+      seed << [x, y]
     end
 
     Element.find("##{canvas_id}").on :dblclick do |event|
       coords = get_cursor_position(event)
       x, y   = coords.x, coords.y
-      unfill_cell(x, y)
+      seed.delete([x, y])
     end
+  end
+
+  def add_enter_event_listener
+    Document.on :keypress do |event|
+      if enter_pressed?(event)
+        seed.each do |x, y|
+          state[[x, y]] = 1
+        end
+
+        run
+      end
+    end
+  end
+
+  def enter_pressed?(event)
+    event.which == 13
+  end
+
+  def add_demo_event_listener
+    Document.on :keypress do |event|
+      if ctrl_d_pressed?(event)
+        [
+          [25, 1],
+          [23, 2], [25, 2],
+          [13, 3], [14, 3], [21, 3], [22, 3],
+          [12, 4], [16, 4], [21, 4], [22, 4], [35, 4], [36, 4],
+          [1, 5],  [2, 5],  [11, 5], [17, 5], [21, 5], [22, 5], [35, 5], [36, 5],
+          [1, 6],  [2, 6],  [11, 6], [15, 6], [17, 6], [18, 6], [23, 6], [25, 6],
+          [11, 7], [17, 7], [25, 7],
+          [12, 8], [16, 8],
+          [13, 9], [14, 9]
+        ].each do |x, y|
+          fill_cell(x, y)
+          seed << [x, y]
+        end
+      end
+    end
+  end
+
+  def ctrl_d_pressed?(event)
+    event.ctrl_key == true && event.which == 4
   end
 end
 
-grid = Grid.new
-grid.draw_canvas
-grid.add_mouse_event_listener
+# grid.add_mouse_event_listener
