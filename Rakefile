@@ -2,9 +2,9 @@
 # 目的是为了使用 Opal 的一些类方法, 用来增加 opal 的 LOAD_PATH, 以及 build 完整的 js.
 require 'opal'
 
-desc 'Build our app to conway.js'
+desc 'Build our app to js'
 task :build do
   Opal.append_path 'app'
-  File.unlink('app/conway.js') if File.exist? 'app/conway.js'
-  File.binwrite 'app/conway.js', Opal::Builder.build('conway').to_s
+  File.unlink('app/grid.js') if File.exist? 'app/grid.js'
+  File.binwrite 'app/grid.js', Opal::Builder.build('grid').to_s
 end
