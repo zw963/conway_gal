@@ -1,17 +1,35 @@
 require 'opal'
 require 'opal-jquery'
+require 'forwardable'
+require 'ostruct'
 require 'grid'
 require 'interval'
-require 'forwardable'
 
 class Conway
-  attr_reader :grid
+  attr_reader :grid, :seed
   extend Forwardable
-
-  def_delegators :@grid, :state, :state=, :redraw_canvas, :seed
 
   def initialize(grid)
     @grid = grid
+    add_enter_event_listener
+  end
+
+  def_delegators :@grid, :state, :state=, :redraw_canvas, :seed
+
+  def add_enter_event_listener
+    Document.on :keypress do |event|
+      if enter_pressed?(event)
+        seed.each do |x, y|
+          state[[x, y]] = 1
+        end
+
+        run
+      end
+    end
+  end
+
+  def enter_pressed?(event)
+    event.which == 13
   end
 
   def run
@@ -35,25 +53,16 @@ class Conway
     new_state
   end
 
-  def is_alive?(x, y)
-    state[[x, y]] == 1
-  end
-
-  def is_dead?(x, y)
-    !is_alive?(x, y)
-  end
-
-  def population_at(x, y)
-    [
-      state[[x-1, y-1]],
-      state[[x-1, y  ]],
-      state[[x-1, y+1]],
-      state[[x,   y-1]],
-      state[[x,   y+1]],
-      state[[x+1, y-1]],
-      state[[x+1, y  ]],
-      state[[x+1, y+1]]
-    ].map(&:to_i).reduce(:+)
+  def get_state_at(x, y)
+    if is_underpopulated?(x, y)
+      0
+    elsif is_living_happily?(x, y)
+      1
+    elsif is_overpopulated?(x, y)
+      0
+    elsif can_reproduce?(x, y)
+      1
+    end
   end
 
   def is_underpopulated?(state, x, y)
@@ -78,17 +87,26 @@ class Conway
     is_dead?(x, y) && population_at(x, y) == 3
   end
 
-  def get_state_at(x, y)
-    if is_underpopulated?(x, y)
-      0
-    elsif is_living_happily?(x, y)
-      1
-    elsif is_overpopulated?(x, y)
-      0
-    elsif can_reproduce?(x, y)
-      1
-    end
+  def population_at(x, y)
+    [
+      state[[x-1, y-1]],
+      state[[x-1, y  ]],
+      state[[x-1, y+1]],
+      state[[x,   y-1]],
+      state[[x,   y+1]],
+      state[[x+1, y-1]],
+      state[[x+1, y  ]],
+      state[[x+1, y+1]]
+    ].map(&:to_i).reduce(:+)
+  end
+
+  def is_alive?(x, y)
+    state[[x, y]] == 1
+  end
+
+  def is_dead?(x, y)
+    !is_alive?(x, y)
   end
 end
 
-Conway.new(Grid.new).run
+Conway.new(Grid.new)

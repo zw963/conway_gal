@@ -1,14 +1,12 @@
 # 这里 require 的内容, 是 Opal 自己的 LOAD_PATH 之下可以查找到的 Ruby 库.
 # 这些库将来会被编译成 js.
 
-require 'ostruct'
-
 class Coordinates < OpenStruct
 end
 
 class Grid
   attr_reader :height, :width, :canvas, :context, :max_x, :max_y
-  attr_accessor :state
+  attr_accessor :state, :seed
 
   CELL_HEIGHT = 15
   CELL_WIDTH  = 15
@@ -20,29 +18,11 @@ class Grid
     @context = `#{canvas}.getContext('2d')` # 每一个 canvas 有一个 context, 我们只能在 context 之上画图.
     @max_x   = (height / CELL_HEIGHT).floor # 决定网格的大小, CELL_HIGHT 数值代表像素的宽度.
     @max_y   = (width / CELL_WIDTH).floor
-    @seed    = []
     @state   = blank_state
+    @seed    = []
     draw_canvas
     add_mouse_event_listener
-    add_enter_event_listener
     add_demo_event_listener
-  end
-
-  def blank_state
-    h = Hash.new
-    (0..max_x).each do |x|
-      (0..max_y).each do |y|
-        h[[x,y]] = 0
-      end
-    end
-    h
-  end
-
-  def redraw_canvas
-    draw_canvas
-    state.each do |cell, liveness|
-      fill_cell(cell[0], cell[1]) if liveness == 1
-    end
   end
 
   def draw_canvas
@@ -67,8 +47,41 @@ class Grid
     `#{context}.stroke()`
   end
 
-  def canvas_id
-    'conwayCanvas'
+  def blank_state
+    h = Hash.new
+    (0..max_x).each do |x|
+      (0..max_y).each do |y|
+        h[[x,y]] = 0
+      end
+    end
+    h
+  end
+
+  def redraw_canvas
+    draw_canvas
+    state.each do |cell, liveness|
+      fill_cell(cell[0], cell[1]) if liveness == 1
+    end
+  end
+
+  def get_cursor_position(event)
+    # 这里的 if/else 是为了兼容不同浏览器设置.
+    if (event.page_x && event.page_y)
+      x = event.page_x;
+      y = event.page_y;
+    else
+      doc = Opal.Document[0]
+      x = event[:clientX] + doc.scrollLeft + doc.documentElement.scrollLeft
+      y = event[:clientY] + doc.body.scrollTop + doc.documentElement.scrollTop
+    end
+
+    x -= `#{canvas}.offsetLeft`
+    y -= `#{canvas}.offsetTop`
+
+    x = (x / CELL_WIDTH).floor
+    y = (y / CELL_HEIGHT).floor
+
+    Coordinates.new(x: x, y: y)
   end
 
   def fill_cell(x, y)
@@ -84,56 +97,24 @@ class Grid
     `#{context}.clearRect(#{x.floor+1}, #{y.floor+1}, #{CELL_WIDTH-1}, #{CELL_HEIGHT-1})`
   end
 
-  def get_cursor_position(event)
-    # 这里的 if/else 是为了兼容不同浏览器设置.
-    if (event.page_x && event.page_y)
-      x = event.page_x;
-      y = event.page_y;
-    else
-      doc = Opal.Document[0]
-      x = event[:clientX] + doc.scrollLeft +
-        doc.documentElement.scrollLeft;
-      y = event[:clientY] + doc.body.scrollTop +
-        doc.documentElement.scrollTop;
-    end
-
-    x -= `#{canvas}.offsetLeft`
-    y -= `#{canvas}.offsetTop`
-
-    x = (x / CELL_WIDTH).floor
-    y = (y / CELL_HEIGHT).floor
-
-    Coordinates.new(x: x, y: y)
+  def canvas_id
+    'conwayCanvas'
   end
 
   def add_mouse_event_listener
     Element.find("##{canvas_id}").on :click do |event|
       coords = get_cursor_position(event)
       x, y   = coords.x, coords.y
+      fill_cell(x, y)
       seed << [x, y]
     end
 
     Element.find("##{canvas_id}").on :dblclick do |event|
       coords = get_cursor_position(event)
       x, y   = coords.x, coords.y
+      unfill_cell(x, y)
       seed.delete([x, y])
     end
-  end
-
-  def add_enter_event_listener
-    Document.on :keypress do |event|
-      if enter_pressed?(event)
-        seed.each do |x, y|
-          state[[x, y]] = 1
-        end
-
-        run
-      end
-    end
-  end
-
-  def enter_pressed?(event)
-    event.which == 13
   end
 
   def add_demo_event_listener
