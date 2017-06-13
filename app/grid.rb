@@ -48,10 +48,10 @@ class Grid
   end
 
   def blank_state
-    h = Hash.new
+    h = {}
     (0..max_x).each do |x|
       (0..max_y).each do |y|
-        h[[x,y]] = 0
+        h[[x, y]] = 0
       end
     end
     h

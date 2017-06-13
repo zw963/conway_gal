@@ -46,7 +46,7 @@ class Conway
   end
 
   def new_state
-    new_state = Hash.new
+    new_state = {}
     state.each do |cell, _|
       new_state[cell] = get_state_at(cell[0], cell[1])
     end
@@ -90,12 +90,12 @@ class Conway
   def population_at(x, y)
     [
       state[[x-1, y-1]],
-      state[[x-1, y  ]],
+      state[[x-1, y]],
       state[[x-1, y+1]],
       state[[x,   y-1]],
       state[[x,   y+1]],
       state[[x+1, y-1]],
-      state[[x+1, y  ]],
+      state[[x+1, y]],
       state[[x+1, y+1]]
     ].map(&:to_i).reduce(:+)
   end

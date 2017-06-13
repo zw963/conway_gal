@@ -1,7 +1,7 @@
 class Interval
   # Note that time is in ms.
-  def initialize(time=0, &block)
-    @interval = `setInterval(function(){#{block.call}}, time)`
+  def initialize(time=0)
+    @interval = `setInterval(function(){#{yield}}, time)`
   end
 
   def stop
