@@ -6,7 +6,7 @@ desc 'Build our app to js'
 task :build do
   Opal.append_path 'app'
   File.unlink('app/conway.js') if File.exist? 'app/conway.js'
-  File.binwrite 'app/conway.js', Opal::Builder.build('conway').to_s
+  File.binwrite 'app/conway.js', Opal::Builder.build('conway', arity_check: true).to_s
 end
 
 require 'opal/rspec/rake_task'
