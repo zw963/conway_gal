@@ -8,3 +8,6 @@ task :build do
   File.unlink('app/conway.js') if File.exist? 'app/conway.js'
   File.binwrite 'app/conway.js', Opal::Builder.build('conway').to_s
 end
+
+require 'opal/rspec/rake_task'
+Opal::RSpec::RakeTask.new(:default)
