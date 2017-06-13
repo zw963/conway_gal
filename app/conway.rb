@@ -65,7 +65,7 @@ class Conway
     end
   end
 
-  def is_underpopulated?(state, x, y)
+  def is_underpopulated?(x, y)
     is_alive?(x, y) && population_at(x, y) < 2
   end
 
