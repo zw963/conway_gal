@@ -66,9 +66,9 @@ class Grid
 
   def get_cursor_position(event)
     # 这里的 if/else 是为了兼容不同浏览器设置.
-    if (event.page_x && event.page_y)
-      x = event.page_x;
-      y = event.page_y;
+    if event.page_x && event.page_y
+      x = event.page_x
+      y = event.page_y
     else
       doc = Opal.Document[0]
       x = event[:clientX] + doc.scrollLeft + doc.documentElement.scrollLeft
@@ -85,15 +85,15 @@ class Grid
   end
 
   def fill_cell(x, y)
-    x *= CELL_WIDTH;
-    y *= CELL_HEIGHT;
+    x *= CELL_WIDTH
+    y *= CELL_HEIGHT
     `#{context}.fillStyle = "#000"`
     `#{context}.fillRect(#{x.floor+1}, #{y.floor+1}, #{CELL_WIDTH-1}, #{CELL_HEIGHT-1})`
   end
 
   def unfill_cell(x, y)
-    x *= CELL_WIDTH;
-    y *= CELL_HEIGHT;
+    x *= CELL_WIDTH
+    y *= CELL_HEIGHT
     `#{context}.clearRect(#{x.floor+1}, #{y.floor+1}, #{CELL_WIDTH-1}, #{CELL_HEIGHT-1})`
   end
 
@@ -119,7 +119,7 @@ class Grid
 
   def add_demo_event_listener
     Document.on :keypress do |event|
-      if ctrl_d_pressed?(event)
+      if ctrl_c_pressed?(event)
         [
           [25, 1],
           [23, 2], [25, 2],
@@ -138,8 +138,8 @@ class Grid
     end
   end
 
-  def ctrl_d_pressed?(event)
-    event.ctrl_key == true && event.which == 4
+  def ctrl_c_pressed?(event)
+    event.ctrl_key == true && event.which == 99
   end
 end
 
