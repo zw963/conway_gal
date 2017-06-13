@@ -1,10 +1,10 @@
 class Interval
   # Note that time is in ms.
   def initialize(time=0)
-    @interval = `setInterval(function(){#{yield}}, time)`
+    @interval = `setInterval(function(){#{yield}}, #{time})`
   end
 
   def stop
-    `clearInterval(#@interval)`
+    `clearInterval(#{@interval})`
   end
 end
