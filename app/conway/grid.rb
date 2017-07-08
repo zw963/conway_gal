@@ -1,4 +1,5 @@
 require 'conway/coordinates'
+require 'console'
 
 class Grid
   attr_reader :height, :width, :canvas, :context, :max_x, :max_y
@@ -11,7 +12,7 @@ class Grid
     @height  = `$(window).height()` # 得到浏览器的高度
     @width   = `$(window).width()`  # 得到浏览器的宽度
     @canvas  = `document.getElementById(#{canvas_id})` # 获取 canvas 元素, 这个元素在页面被定义.
-    @context = `#{canvas}.getContext('2d')` # 每一个 canvas 有一个 context, 我们只能在 context 之上画图.
+    @context = `#{@canvas}.getContext('2d')` # 每一个 canvas 有一个 context, 我们只能在 context 之上画图.
     @max_x   = (height / CELL_HEIGHT).floor # 决定网格的大小, CELL_HIGHT 数值代表像素的宽度.
     @max_y   = (width / CELL_WIDTH).floor
     @state   = blank_state
