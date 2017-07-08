@@ -116,6 +116,7 @@ class Grid
 
   def add_demo_event_listener
     Document.on :keypress do |event|
+      $console.log 'key pressed'
       if ctrl_c_pressed?(event)
         [
           [25, 1],
