@@ -6,5 +6,5 @@ run Opal::Server.new {|s|
   s.main = 'application'
 
   # This can be used to provide a custom index file.
-  # s.index_path = 'my_index.erb'
+  s.index_path = 'index.html.erb'
 }
