@@ -1,5 +1,4 @@
 require 'conway/coordinates'
-require 'console'
 
 class Grid
   attr_reader :height, :width, :canvas, :context, :max_x, :max_y

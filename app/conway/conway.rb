@@ -1,11 +1,4 @@
-require 'opal'
-require 'jquery-1.12.4.min'
-require 'jquery-migrate-1.4.1.min'
-require 'opal-jquery'
 require 'forwardable'
-require 'ostruct'
-require 'conway/grid'
-require 'conway/interval'
 
 class Conway
   attr_reader :grid, :seed
